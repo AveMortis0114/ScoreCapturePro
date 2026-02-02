@@ -1,0 +1,100 @@
+name: Build ScoreCapturePro
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch: # 수동 실행 옵션
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12.2
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.2"
+          cache: "pip"
+
+      - name: Install ccache (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install ccache
+          echo "PATH=/usr/lib/ccache:$PATH" >> $GITHUB_ENV
+
+      - name: Cache Nuitka Build Artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            main.build
+            *.build
+            ~/.ccache
+            ~/Library/Caches/Nuitka
+            C:\Users\runneradmin\AppData\Local\Nuitka
+          key: ${{ runner.os }}-nuitka-${{ hashFiles('requirements.txt') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-nuitka-${{ hashFiles('requirements.txt') }}-
+            ${{ runner.os }}-nuitka-
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Build with Nuitka (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          python -m nuitka --standalone --onefile --enable-plugin=pyside6 --assume-yes-for-downloads `
+            --windows-console-mode=disable `
+            --windows-icon-from-ico=assets/icon.ico `
+            --include-data-dir=fonts=fonts `
+            --include-data-dir=models=models `
+            --include-data-dir=assets=assets `
+            --include-data-file=version.json=version.json `
+            --output-filename=ScoreCapturePro.exe `
+            main.py
+
+      - name: Build with Nuitka (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          export NUITKA_CCACHE_BINARY=$(which ccache)
+
+          python -m nuitka --standalone --enable-plugin=pyside6 --assume-yes-for-downloads \
+            --macos-create-app-bundle \
+            --macos-disable-console \
+            --macos-app-icon=assets/icon.png \
+            --include-data-dir=fonts=fonts \
+            --include-data-dir=models=models \
+            --include-data-dir=assets=assets \
+            --include-data-file=version.json=version.json \
+            --output-filename=ScoreCapturePro \
+            main.py
+
+          if [ -d "main.app" ]; then
+            mv main.app ScoreCapturePro.app
+          fi
+
+          plutil -replace CFBundleIdentifier -string "com.scorecapturepro.app" ScoreCapturePro.app/Contents/Info.plist
+
+          plutil -replace NSScreenCaptureUsageDescription -string "악보 캡처를 위해 화면 녹화 권한이 필요합니다." ScoreCapturePro.app/Contents/Info.plist
+
+          codesign --force --deep --sign - ScoreCapturePro.app
+
+          zip -r ScoreCapturePro_Mac.zip ScoreCapturePro.app
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ScoreCapturePro-${{ matrix.os }}
+          path: |
+            ScoreCapturePro.exe
+            ScoreCapturePro_Mac.zip
+          if-no-files-found: ignore

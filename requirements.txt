@@ -1,0 +1,12 @@
+numpy
+opencv-python
+opencv-contrib-python
+pillow
+imagehash
+qrcode
+PySide6
+pyinstaller
+nuitka
+zstandard
+imageio
+pyobjc-framework-Quartz; sys_platform == 'darwin'
