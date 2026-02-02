@@ -40,16 +40,17 @@
 
 | 메인 화면 |
 | :---: |
-| <img width="1198" height="727" alt="스크린샷 2026-02-01 오후 3 38 38" src="https://github.com/user-attachments/assets/84cea23c-0253-4148-8a81-24886aeb40d7" />
+| <img width="1198" height="727" alt="메인 화면" src="https://github.com/user-attachments/assets/294bf7fc-8856-4e0f-99ba-ff4a68223b26" />
 
 | PDF 편집 및 미리보기 |
 | :---: |
-|<img width="1158" height="705" alt="스크린샷 2026-02-01 오후 7 35 50" src="https://github.com/user-attachments/assets/bf11a241-4e85-4c1d-9358-ac5bf384f795" />
+| <img width="1158" height="705" alt="PDF 편집 및 미리보기" src="https://github.com/user-attachments/assets/4b921c20-693b-4d15-b13d-6d3acd708045" />
 
 
 | 미니 모드 |
 | :---: |
-| <img width="319" height="488" alt="스크린샷 2026-02-01 오후 3 38 53" src="https://github.com/user-attachments/assets/1549a8ea-9768-4130-9d4b-c975b8137872" />
+| <img width="319" height="488" alt="미니 모드" src="https://github.com/user-attachments/assets/e8b37be7-d229-4cd3-9db1-72ac053631af" />
+
 
 ---
 
